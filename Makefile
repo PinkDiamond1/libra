@@ -31,6 +31,7 @@ REPO_NAME = dev-genesis
 MNEM = $(shell cat ol/fixtures/mnemonic/${NS}.mnem)
 CARGO_ARGS = --locked # just keeping this from doing --release mode, while in testnet mode.
 GITHUB_USER = Leibniz137
+REPO_ORG = Leibniz137
 endif
 
 # Registration params
