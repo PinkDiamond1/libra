@@ -66,7 +66,7 @@ download: web-files
 		chmod 744 ${USER_BIN_PATH}/$$(echo $$b | rev | cut -d"/" -f1 | rev) ;\
 	done
 
-web-files: 
+web-files:
 	curl -L --progress-bar --create-dirs -o ${DATA_PATH}/web-monitor.tar.gz https://github.com/OLSF/libra/releases/latest/download/web-monitor.tar.gz
 	mkdir ${DATA_PATH}/web-monitor | true
 	tar -xf ${DATA_PATH}/web-monitor.tar.gz --directory ${DATA_PATH}/web-monitor
@@ -94,7 +94,7 @@ stdlib:
 # cargo run ${CARGO_ARGS} -p diem-framework
 	cargo run ${CARGO_ARGS} -p diem-framework -- --create-upgrade-payload
 	sha256sum language/diem-framework/staged/stdlib.mv
-  
+
 
 install: mv-bin bin-path
 	mkdir ${USER_BIN_PATH} | true
@@ -154,7 +154,7 @@ danger-restore:
 	rsync -rtv ${HOME}/0L_backup/set_layout.toml ${HOME}/.0L/ | true
 
 
-	
+
 
 
 clear-prod-db:
@@ -165,12 +165,12 @@ clear-prod-db:
 reset-safety:
 	@echo CLEARING SAFETY RULES IN KEY_STORE.JSON
 	jq -r '.["${ACC}-oper/safety_data"].value = { "epoch": 0, "last_voted_round": 0, "preferred_round": 0, "last_vote": null }' ${DATA_PATH}/key_store.json > ${DATA_PATH}/temp_key_store && mv ${DATA_PATH}/temp_key_store ${DATA_PATH}/key_store.json
-	
+
 
 move-test:
 	cd language/move-lang/functional-tests/ && cargo t 0L
 #### GENESIS BACKEND SETUP ####
-init-backend: 
+init-backend:
 	curl -X POST -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/orgs/${REPO_ORG}/repos -d '{"name":"${REPO_NAME}", "private": "true", "auto_init": "true"}'
 
 layout:
@@ -262,7 +262,7 @@ owner-key:
 
 # OWNER does this
 # Links to an operator on github, creates the OWNER_ACCOUNT locally
-assign: 
+assign:
 	cargo run -p diem-genesis-tool ${CARGO_ARGS} --  set-operator \
 	--operator-name ${OPER} \
 	--shared-backend ${REMOTE}
@@ -277,7 +277,7 @@ reg:
 	--fullnode-address "/ip4/${IP}/tcp/6179" \
 	--validator-backend ${LOCAL} \
 	--shared-backend ${REMOTE}
-	
+
 
 # Helpers to verify the local state.
 verify:
@@ -320,7 +320,7 @@ daemon:
 	@if test -d ~/logs; then \
 		echo "WIPING SYSTEMD LOGS"; \
 		rm -rf ~/logs*; \
-	fi 
+	fi
 
 	mkdir ~/logs
 	touch ~/logs/node.log
@@ -329,7 +329,7 @@ daemon:
 	systemctl --user stop diem-node.service
 	systemctl --user start diem-node.service
 	sleep 2
-	
+
 	systemctl --user status diem-node.service &
 	tail -f ~/logs/node.log
 
@@ -383,11 +383,11 @@ ifdef TEST
 
 	@if test -f ${DATA_PATH}/vdf_proofs/proof_0.json; then \
 		rm ${DATA_PATH}/vdf_proofs/proof_0.json; \
-	fi 
+	fi
 
 	@if test -f ${DATA_PATH}/0L.toml; then \
 		rm ${DATA_PATH}/0L.toml; \
-	fi 
+	fi
 
 # skip miner configuration with fixtures
 	cp ./ol/fixtures/configs/${NS}.toml ${DATA_PATH}/0L.toml
@@ -438,7 +438,7 @@ remove-keys:
 	jq 'del(.["${ACC}-oper/owner", "${ACC}-oper/operator"])' ${DATA_PATH}/key_store.json > ${DATA_PATH}/tmp
 	mv ${DATA_PATH}/tmp ${DATA_PATH}/key_store.json
 
-wipe: 
+wipe:
 	history -c
 	shred ~/.bash_history
 	srm ~/.bash_history
@@ -448,18 +448,18 @@ stop:
 
 debug:
 	make smoke-onboard <<< $$'${MNEM}'
- 
+
 
 ##### DEVNET TESTS #####
 
 devnet: clear fix dev-wizard dev-genesis start
-# runs a smoke test from fixtures. 
+# runs a smoke test from fixtures.
 # Uses genesis blob from fixtures, assumes 3 validators, and test settings.
 # This will work for validator nodes alice, bob, carol, and any fullnodes; 'eve'
 
 dev-join: clear fix fix-genesis dev-wizard
 # REQUIRES MOCK GIT INFRASTRUCTURE: OLSF/dev-genesis OLSF/dev-epoch-archive
-# see `devnet-archive` below 
+# see `devnet-archive` below
 # We want to simulate the onboarding/new validator fetching genesis files from the mock archive: dev-genesis-archive
 
 # mock restore backups from dev-epoch-archive
@@ -503,7 +503,7 @@ TAG=$(shell git tag -l "previous")
 clean-tags:
 	git push origin --delete ${TAG}
 	git tag -d ${TAG}
-	
+
 nuke-testnet:
 	@echo WIPING EVERYTHING but keeping: github_token.txt, autopay_batch.json, set_layout.toml, /vdf_proofs/proof_0.json
 
@@ -514,7 +514,7 @@ nuke-testnet:
 		cd ${DATA_PATH} && mkdir vdf_proofs;\
 		cd ~ && cp proof_0.json ${DATA_PATH}/vdf_proofs/; \
 	fi
-	
+
 
 ####### SWARM ########
 
@@ -566,6 +566,6 @@ fork-config:
 	cargo run -p onboard -- fork -u http://167.172.248.37 --prebuilt-genesis ${DATA_PATH}/genesis_from_snapshot.blob
 
 # start node from files
-fork-start: 
+fork-start:
 	rm -rf ~/.0L/db
 	cargo run -p libra-node -- --config ~/.0L/validator.node.yaml
